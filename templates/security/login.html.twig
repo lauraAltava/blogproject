@@ -1,8 +1,8 @@
 {% extends 'base.html.twig' %}
-
 {% block title %}Log in!{% endblock %}
-
-{% block body %}
+{% block cssstyle %}sub_page{% endblock %}
+{% block body %} 
+</div>
 <form method="post">
     {% if error %}
         <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
@@ -28,4 +28,6 @@
         Sign in
     </button>
 </form>
+<a href="{{ path('app_register') }}">Registrarse</a>
+
 {% endblock %}
