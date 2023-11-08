@@ -1,0 +1,21 @@
+
+   {% extends 'base.html.twig' %}
+{% block title %}Log in!{% endblock %}
+{% block cssstyle %}sub_page{% endblock %}
+{% block body %} 
+</div>
+<form method="post" enctype="multipart/form-data">
+    {% if app.user %}
+        <div class="mb-3">
+            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+        </div>
+    {% endif %}
+
+    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+    {{form(formulario)}}
+</form>
+<a href="{{ path('app_register') }}">Registrarse</a>
+
+{% endblock %}
+
+

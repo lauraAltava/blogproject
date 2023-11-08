@@ -2,10 +2,18 @@
 
 namespace App\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use App\Entity\Trabajador;
+use App\Form\TrabajadorFormType;
+use App\Form\TrabajadorFormTypeOLD;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
+use Symfony\Component\Routing\Annotation\Route;
+use Doctrine\Persistence\ManagerRegistry;
 class PageController extends AbstractController
 {
     #[Route('/', name: 'index')]
@@ -38,6 +46,53 @@ class PageController extends AbstractController
     public function team(): Response
     {
         return $this->render('page/team.html.twig', []);
+    }
+
+    #[Route('/trabajador', name: 'app_trabajador')]
+
+    public function trabajador(ManagerRegistry $doctrine, Request $request, SessionInterface $session
+    , SluggerInterface $slugger){
+        $user = $this->getUser();
+        
+        if ($user){
+        $trabajador = new trabajador();
+        $formulario = $this->createForm(TrabajadorFormType::class, $trabajador);
+        $formulario->handleRequest($request);
+        
+
+
+    if ($formulario->isSubmitted() && $formulario->isValid()) {
+        $trabajador = $formulario->getData();
+        $file = $formulario->get('foto')->getData();
+        if ($file) {
+            $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            // this is needed to safely include the file name as part of the URL
+            $safeFilename = $slugger->slug($originalFilename);
+            $newFilename = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
+    
+            // Move the file to the directory where images are stored
+            try {
+    
+                $file->move(
+                    $this->getParameter('images_directory'), $newFilename
+                );
+               
+            } catch (FileException $e) {
+               
+            }
+            $trabajador->setFoto($newFilename);
+        }
+           
+        $entityManager = $doctrine->getManager();    
+        $entityManager->persist($trabajador);
+        $entityManager->flush();
+    }
+    return $this->render('join_us/trabajador.html.twig', array(
+        'formulario' => $formulario->createView()));
+    
+
+    }
+
     }
 
 }
