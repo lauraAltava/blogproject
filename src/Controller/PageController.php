@@ -17,12 +17,15 @@ use Doctrine\Persistence\ManagerRegistry;
 class PageController extends AbstractController
 {
     #[Route('/', name: 'index')]
-    public function index(): Response
-    {
+    public function index(ManagerRegistry $doctrine): Response{
+
+        $repositorio = $doctrine->getRepository(Trabajador::class);
+        $trabajadores = $repositorio->findAll();
+
         return $this->render('page/index.html.twig', [
-            'controller_name' => 'PageController',
+            'trabajadores' => $trabajadores
         ]);
-    }
+    } 
 
     #[Route('/about', name: 'about')]
     public function about(): Response
@@ -43,9 +46,14 @@ class PageController extends AbstractController
     }
 
     #[Route('/team', name: 'team')]
-    public function team(): Response
-    {
-        return $this->render('page/team.html.twig', []);
+    public function team(ManagerRegistry $doctrine): Response{
+
+        $repositorio = $doctrine->getRepository(Trabajador::class);
+        $trabajadores = $repositorio->findAll();
+
+      return $this->render('page/team.html.twig', [
+            'trabajadores' => $trabajadores
+        ]);
     }
 
     #[Route('/trabajador', name: 'app_trabajador')]
@@ -54,7 +62,7 @@ class PageController extends AbstractController
     , SluggerInterface $slugger){
         $user = $this->getUser();
         
-        if ($user){
+       
         $trabajador = new trabajador();
         $formulario = $this->createForm(TrabajadorFormType::class, $trabajador);
         $formulario->handleRequest($request);
@@ -87,12 +95,12 @@ class PageController extends AbstractController
         $entityManager->persist($trabajador);
         $entityManager->flush();
     }
+    
     return $this->render('join_us/trabajador.html.twig', array(
         'formulario' => $formulario->createView()));
-    
-
-    }
-
-    }
 
 }
+
+    }
+
+
